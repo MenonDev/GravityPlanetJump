@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Jump Game</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: #1a1a1a;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 20px;
+            padding: 10px;
+            text-align: center;
+            background: #333;
+            flex-shrink: 0;
+        }
+
+        #controls {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            flex-shrink: 0;
+        }
+
+        #weightInput {
+            flex: 2;
+            min-width: 120px;
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: #2ECC71;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+        button[disabled]{
+          border: 1px solid #999999;
+          background-color: #cccccc;
+          color: #666666;
+        }
+
+        #container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 5px;
+            padding: 5px;
+            min-height: 0;
+        }
+
+        .planet {
+            background: white;
+            border-radius: 10px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .planet-name {
+            font-size: 16px;
+            padding: 8px 0;
+            text-align: center;
+        }
+
+        .weight-display {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .character {
+            width: 70px;
+            position: absolute;
+            bottom: 20%;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .line {
+          width: 50%;
+          position: absolute;
+          bottom: 20%;
+          border-color: black;
+        }
+
+        /* Planet Colors */
+        #earth { background: #2E86C1; }
+        #mars { background: #E74C3C; }
+        #moon { background: #7F8C8D; }
+        #jupiter { background: #F1C40F; }
+
+        @media (min-width: 768px) {
+            h1 { font-size: 24px; }
+            #controls { padding: 20px; }
+            #weightInput { font-size: 16px; }
+            button { font-size: 16px; }
+            .planet-name { font-size: 20px; }
+            .weight-display { font-size: 16px; }
+            .character { width: 60px; }
+        }
+
+        @media (max-width: 480px) {
+            #controls {
+                gap: 5px;
+                padding: 8px;
+            }
+            button {
+                padding: 8px;
+                min-width: 60px;
+            }
+            .planet-name {
+                font-size: 14px;
+                padding: 4px 0;
+            }
+            .weight-display {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Planet Jump! 🚀</h1>
+    
+    <div id="controls">
+        <input type="number" id="weightInput" placeholder="Weight (kg)">
+        <button onclick="calculateWeights()">Calculate</button>
+        <button onclick="jump()" id="jumpBtn" disabled>JUMP!</button>
+    </div>
+
+    <div id="container">
+        <div class="planet" id="earth">
+            <div class="planet-name">Earth 🌍</div>
+            <div id="earth-weight" class="weight-display">-</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/6098/6098680.png" class="character" id="earth-char">
+            <hr class="line" />
+        </div>
+
+        <div class="planet" id="mars">
+            <div class="planet-name">Mars 🔴</div>
+            <div id="mars-weight" class="weight-display">-</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/6098/6098680.png" class="character" id="mars-char">
+            <hr class="line" />
+        </div>
+
+        <div class="planet" id="moon">
+            <div class="planet-name">Moon 🌕</div>
+            <div id="moon-weight" class="weight-display">-</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/6098/6098680.png" class="character" id="moon-char">
+            <hr class="line" />        
+        </div>
+
+        <div class="planet" id="jupiter">
+            <div class="planet-name">Jupiter 🪐</div>
+            <div id="jupiter-weight" class="weight-display">-</div>
+            <img src="https://cdn-icons-png.flaticon.com/512/6098/6098680.png" class="character" id="jupiter-char">
+            <hr class="line" />
+        </div>
+    </div>
+
+    <script>
+        const GRAVITY = {
+            earth: 9.81,
+            mars: 3.71,
+            moon: 1.62,
+            jupiter: 24.79
+        };
+
+        function calculateWeights() {
+            const weight = parseFloat(document.getElementById('weightInput').value);
+            if (isNaN(weight)) return;
+
+            document.getElementById('earth-weight').textContent = `${weight.toFixed(1)}kg`;
+            document.getElementById('mars-weight').textContent = `${(weight * GRAVITY.mars/GRAVITY.earth).toFixed(1)}kg`;
+            document.getElementById('moon-weight').textContent = `${(weight * GRAVITY.moon/GRAVITY.earth).toFixed(1)}kg`;
+            document.getElementById('jupiter-weight').textContent = `${(weight * GRAVITY.jupiter/GRAVITY.earth).toFixed(1)}kg`;
+            
+            document.getElementById('jumpBtn').disabled = false;
+        }
+
+        function jump() {
+            const baseJumpHeight = 50; // Percentage of container height
+            
+            // Reset positions
+            document.querySelectorAll('.character').forEach(char => {
+                char.style.transform = 'translateY(0)';
+            });
+
+            // Force reflow before animation
+            void document.body.offsetHeight;
+
+            // Animate jumps
+            animateJump('earth-char', baseJumpHeight);
+            animateJump('mars-char', baseJumpHeight * (GRAVITY.earth/GRAVITY.mars));
+            animateJump('moon-char', baseJumpHeight * (GRAVITY.earth/GRAVITY.moon));
+            animateJump('jupiter-char', baseJumpHeight * (GRAVITY.earth/GRAVITY.jupiter));
+        }
+
+        function animateJump(elementId, jumpHeight) {
+            const character = document.getElementById(elementId);
+            character.style.transform = `translateY(-${jumpHeight}%)`;
+            
+            setTimeout(() => {
+                character.style.transform = 'translateY(0)';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
