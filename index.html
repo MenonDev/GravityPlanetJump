@@ -201,7 +201,10 @@
         }
 
         function jump() {
-            const baseJumpHeight = 50; // Percentage of container height
+            let weight = parseFloat(document.getElementById('weightInput').value);
+            if (isNaN(weight)) weight=1;
+
+            const baseJumpHeight = 100-weight < 20 ? 20 : 100-weight; // Percentage of container height
             
             // Reset positions
             document.querySelectorAll('.character').forEach(char => {
